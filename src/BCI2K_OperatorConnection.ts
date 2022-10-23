@@ -47,24 +47,15 @@ export class BCI2K_OperatorConnection {
       };
       this.websocket.onopen = () => resolve();
 
-
-      let parseError = false
       this.websocket.onmessage = (event) => {
-        try {
-          let { opcode, id, response } = JSON.parse(event.data);
-          switch (opcode) {
-            case "O":
-              this.responseBuffer.push({ id: id, response: response });
-              this.newData(response);
-              break;
-            default:
-              break;
-          }
-        } catch (e) {
-          if (!parseError) {
-            console.log("Error parsing message from BCI2000", e);
-            parseError = true
-          }
+        let { opcode, id, contents } = JSON.parse(event.data);
+        switch (opcode) {
+          case "O":
+            this.responseBuffer.push({ id: id, response: contents });
+            this.newData(contents);
+            break;
+          default:
+            break;
         }
       };
     });
